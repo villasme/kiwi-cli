@@ -4,6 +4,7 @@
  * @desc 获取语言文件
  */
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.getLangData = exports.getSuggestLangObj = void 0;
 const globby = require("globby");
 const fs = require("fs");
 const path = require("path");
@@ -55,7 +56,7 @@ function getI18N() {
         if (Object.keys(jsObj).length === 0) {
             console.log(`\`${curr}\` 解析失败，该文件包含的文案无法自动补全`);
         }
-        return Object.assign({}, prev, { [filename]: jsObj });
+        return Object.assign(Object.assign({}, prev), { [filename]: jsObj });
     }, {});
     return langObj;
 }

@@ -4,6 +4,7 @@
  * @desc 文件处理方法
  */
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.writeFile = exports.readFile = exports.getSpecifiedFiles = void 0;
 const path = require("path");
 const fs = require("fs");
 /**

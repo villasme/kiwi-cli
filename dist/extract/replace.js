@@ -4,6 +4,7 @@
  * @desc 更新文件
  */
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.createImportI18N = exports.hasImportI18N = exports.replaceAndUpdate = void 0;
 const fs = require("fs-extra");
 const _ = require("lodash");
 const prettier = require("prettier");

@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.findChineseText = void 0;
 /**
  * @author doubledream
  * @desc 利用 Ast 查找对应文件中的中文文案

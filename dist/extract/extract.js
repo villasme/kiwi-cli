@@ -1,9 +1,10 @@
 "use strict";
 /**
- * @author doubledream
+ * @author douvillasbledream
  * @desc 提取指定文件夹下的中文
  */
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.extractAll = void 0;
 const _ = require("lodash");
 const randomstring = require("randomstring");
 const slash = require("slash2");
