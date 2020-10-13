@@ -162,10 +162,11 @@ function findTextInHtml(code) {
  * @param code
  */
 function findTextInVue(code) {
+    var _a, _b;
     const vueObejct = compilerVue.compile(code.toString(), { outputSourceRange: true });
     let TextaArr = findVueText(vueObejct.ast);
     const sfc = compilerVue.parseComponent(code.toString());
-    let vueTemp = findTextInVueTs(sfc.script.content, 'fileName', sfc.script.start);
+    let vueTemp = findTextInVueTs(((_a = sfc === null || sfc === void 0 ? void 0 : sfc.script) === null || _a === void 0 ? void 0 : _a.content) || '', 'fileName', ((_b = sfc === null || sfc === void 0 ? void 0 : sfc.script) === null || _b === void 0 ? void 0 : _b.start) || 0);
     return vueTemp.concat(TextaArr);
 }
 function findTextInVueTs(code, fileName, startNum) {

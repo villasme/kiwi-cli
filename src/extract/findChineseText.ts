@@ -187,7 +187,7 @@ function findTextInVue(code: string) {
   const vueObejct = compilerVue.compile(code.toString(), { outputSourceRange: true });
   let TextaArr = findVueText(vueObejct.ast);
   const sfc = compilerVue.parseComponent(code.toString());
-  let vueTemp = findTextInVueTs(sfc.script.content, 'fileName', sfc.script.start);
+  let vueTemp = findTextInVueTs(sfc?.script?.content || '', 'fileName', sfc?.script?.start || 0);
   return vueTemp.concat(TextaArr);
 }
 function findTextInVueTs(code: string, fileName: string, startNum: number) {
