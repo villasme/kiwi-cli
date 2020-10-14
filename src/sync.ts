@@ -96,7 +96,7 @@ async function translateFile(file: string, toLang: any) {
   });
   const toLangDir = path.resolve(__dirname, `../${toLang}`);
   if (!fs.existsSync(toLangDir)) {
-    fs.mkdirSync(toLangDir);
+    await fs.mkdirSync(toLangDir);
   }
 
   writeTranslations(file, toLang, translateAllTexts);
@@ -107,6 +107,14 @@ async function translateFile(file: string, toLang: any) {
  */
 function sync(callback?: Function) {
   const srcLangDir = getLangDir(CONFIG.srcLang);
+  /** 初始化语言种类目录 */
+  CONFIG.distLangs.forEach(langStr => {
+    const langPath = getLangDir(langStr)
+    if (!fs.existsSync(langPath)) {
+      fs.mkdirSync(langPath);
+      console.info(`\n同步文件：${langPath}`)
+    }
+  })
   fs.readdir(srcLangDir, (err, files) => {
     if (err) {
       console.error(err);

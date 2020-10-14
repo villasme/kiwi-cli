@@ -9,7 +9,7 @@ import * as fs from 'fs';
 import { lookForFiles } from './utils';
 import { PROJECT_CONFIG, KIWI_CONFIG_FILE } from './const';
 
-function creteConfigFile(existDir?: string) {
+function createConfigFile(existDir?: string) {
   if (!lookForFiles(path.resolve(process.cwd(), `./`), KIWI_CONFIG_FILE)) {
     const existConfigFile = _.endsWith(existDir, '/')
       ? `${existDir}${KIWI_CONFIG_FILE}`
@@ -67,7 +67,7 @@ function initProject(existDir?: string) {
   } else if (!fs.existsSync(PROJECT_CONFIG.dir)) {
     fs.mkdirSync(PROJECT_CONFIG.dir);
   }
-  creteConfigFile(existDir);
+  createConfigFile(existDir);
   if (!(existDir && fs.existsSync(existDir))) {
     createCnFile();
   }

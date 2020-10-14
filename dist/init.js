@@ -10,7 +10,7 @@ const path = require("path");
 const fs = require("fs");
 const utils_1 = require("./utils");
 const const_1 = require("./const");
-function creteConfigFile(existDir) {
+function createConfigFile(existDir) {
     if (!utils_1.lookForFiles(path.resolve(process.cwd(), `./`), const_1.KIWI_CONFIG_FILE)) {
         const existConfigFile = _.endsWith(existDir, '/')
             ? `${existDir}${const_1.KIWI_CONFIG_FILE}`
@@ -60,7 +60,7 @@ function initProject(existDir) {
     else if (!fs.existsSync(const_1.PROJECT_CONFIG.dir)) {
         fs.mkdirSync(const_1.PROJECT_CONFIG.dir);
     }
-    creteConfigFile(existDir);
+    createConfigFile(existDir);
     if (!(existDir && fs.existsSync(existDir))) {
         createCnFile();
     }

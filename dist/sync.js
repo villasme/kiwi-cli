@@ -105,7 +105,7 @@ function translateFile(file, toLang) {
         });
         const toLangDir = path.resolve(__dirname, `../${toLang}`);
         if (!fs.existsSync(toLangDir)) {
-            fs.mkdirSync(toLangDir);
+            yield fs.mkdirSync(toLangDir);
         }
         writeTranslations(file, toLang, translateAllTexts);
     });
@@ -115,6 +115,14 @@ function translateFile(file, toLang) {
  */
 function sync(callback) {
     const srcLangDir = utils_1.getLangDir(CONFIG.srcLang);
+    /** 初始化语言种类目录 */
+    CONFIG.distLangs.forEach(langStr => {
+        const langPath = utils_1.getLangDir(langStr);
+        if (!fs.existsSync(langPath)) {
+            fs.mkdirSync(langPath);
+            console.info(`\n同步文件：${langPath}`);
+        }
+    });
     fs.readdir(srcLangDir, (err, files) => {
         if (err) {
             console.error(err);
