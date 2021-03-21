@@ -10,6 +10,7 @@ import { findUnUsed } from './unused';
 import { mockLangs } from './mock';
 import { extractAll } from './extract/extract';
 import * as ora from 'ora';
+import { exportAllMessages } from './exportAll';
 
 /**
  * 进度条加载
@@ -29,6 +30,7 @@ commander
   .option('--init', '初始化项目', { isDefault: true })
   .option('--import [file] [lang]', '导入翻译文案')
   .option('--export [file] [lang]', '导出未翻译的文案')
+  .option('--exportAll [file] [lang]', '导出所有文案')
   .option('--sync', '同步各种语言的文案(isAutoTranslate=ture 自动翻译)')
   .option('--mock', '使用 百度/Google 翻译')
   .option('--unused', '导出未使用的文案')
@@ -71,12 +73,25 @@ if (commander.import) {
   });
 }
 
+
+
 if (commander.export) {
   spining('导出未翻译的文案', () => {
     if (commander.export === true && commander.args.length === 0) {
       exportMessages();
     } else if (commander.args) {
       exportMessages(commander.export, commander.args[0]);
+    }
+  });
+}
+
+
+if (commander.exportAll) {
+  spining('导出所有的文案', () => {
+    if (commander.exportAll === true && commander.args.length === 0) {
+      exportAllMessages();
+    } else if (commander.args) {
+      exportAllMessages(commander.exportAll, commander.args[0]);
     }
   });
 }
