@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.mockLangs = void 0;
+exports.mockLangs = exports.getMockTexts = exports.getDistText = void 0;
 /**
  * @author linhuiw
  * @desc 翻译方法
@@ -47,6 +47,7 @@ function getDistText(dstLang) {
     }
     return distTexts;
 }
+exports.getDistText = getDistText;
 /**
  * 获取对应语言mock文案
  * @param dstLang
@@ -60,6 +61,7 @@ function getMockTexts(dstLang) {
     }
     return mockTexts;
 }
+exports.getMockTexts = getMockTexts;
 /**
  * Mock 对应语言
  * @param dstLang
@@ -69,7 +71,7 @@ function mockCurrentLang(dstLang) {
         const texts = getSourceText();
         const distTexts = getDistText(dstLang);
         const untranslatedTexts = {};
-        const mocks = {};
+        const mocks = getMockTexts(dstLang);
         /** 遍历文案 */
         utils_1.traverse(texts, (text, path) => {
             const distText = _.get(distTexts, path);
@@ -80,8 +82,14 @@ function mockCurrentLang(dstLang) {
         /** 调用 Google 翻译 */
         const translateAllTexts = Object.keys(untranslatedTexts).map(key => {
             return new Promise((resolve, reject) => {
-                console.warn(`\n\t准备翻译：${untranslatedTexts[key]}`);
-                resolve(utils_1.translateText(untranslatedTexts[key], dstLang).then(translatedText => [key, translatedText]));
+                if (mocks[key]) {
+                    console.warn('\n\t <mocks> key:%s 存在mocks中：value %s', key, mocks[key]);
+                    resolve([key, mocks[key]]);
+                }
+                else {
+                    console.warn(`\n\t准备翻译：key: ${key} ,  文案： ${untranslatedTexts[key]} `);
+                    resolve(utils_1.translateText(untranslatedTexts[key], dstLang).then(translatedText => [key, translatedText]));
+                }
             });
         });
         /** 获取 Mocks 文案 */
@@ -89,9 +97,9 @@ function mockCurrentLang(dstLang) {
             res.forEach(([key, translatedText]) => {
                 mocks[key] = translatedText;
             });
-            console.log(mocks);
             return mocks;
         });
+        console.log('开始写入...');
         return writeMockFile(dstLang, mocks);
     });
 }
@@ -109,6 +117,7 @@ function writeMockFile(dstLang, mocks) {
                 reject(err);
             }
             else {
+                console.log('写入完成');
                 resolve();
             }
         });

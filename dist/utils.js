@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.lookForFiles = exports.flatten = exports.findMatchValue = exports.findMatchKey = exports.translateText = exports.getProjectConfig = exports.getAllMessages = exports.withTimeout = exports.retry = exports.traverse = exports.getLangDir = exports.getKiwiDir = void 0;
+exports.lookForFiles = exports.flatten = exports.findMatchValue = exports.findMatchKey = exports.translateText = exports.getProjectConfig = exports.getAllMessages = exports.withTimeout = exports.retry = exports.traverse = exports.getKiwiSrcLang = exports.baiduTranslate = exports.getLangDir = exports.getKiwiDir = exports.getExemption = void 0;
 /**
  * @author linhuiw
  * @desc 工具方法
@@ -11,7 +11,7 @@ const fs = require("fs");
 const node_fetch_1 = require("node-fetch");
 const crypto_1 = require("crypto");
 const FormData = require("form-data");
-const deasync = require("deasync");
+const baidu_1 = require("./baidu");
 const const_1 = require("./const");
 function lookForFiles(dir, fileName) {
     const files = fs.readdirSync(dir);
@@ -47,6 +47,16 @@ function getProjectConfig() {
 }
 exports.getProjectConfig = getProjectConfig;
 /**
+ * 获得免翻文案
+ */
+function getExemption() {
+    const CONFIG = getProjectConfig();
+    const srcFile = path.resolve(CONFIG.exemption);
+    const texts = require(srcFile);
+    return texts;
+}
+exports.getExemption = getExemption;
+/**
  * 获取语言资源的根目录
  */
 function getKiwiDir() {
@@ -56,6 +66,16 @@ function getKiwiDir() {
     }
 }
 exports.getKiwiDir = getKiwiDir;
+/**
+ * 获取语言资源 srcLang eg: zh_CN
+ */
+function getKiwiSrcLang() {
+    const config = getProjectConfig();
+    if (config) {
+        return config.srcLang;
+    }
+}
+exports.getKiwiSrcLang = getKiwiSrcLang;
 /**
  * 获取对应语言的目录位置
  * @param lang
@@ -141,9 +161,21 @@ exports.withTimeout = withTimeout;
  */
 function translateText(text, toLang) {
     const CONFIG = getProjectConfig();
-    deasync.sleep(2000);
+    if (!text) {
+        return Promise.resolve('');
+    }
     if (!CONFIG.googleApiKey) {
-        return baiduTranslate(text, toLang);
+        return new Promise((resolve, reject) => {
+            baidu_1.translate(text, toLang)(function (data, err) {
+                if (err) {
+                    resolve('');
+                    console.log('error:', err);
+                }
+                else {
+                    resolve(data);
+                }
+            });
+        });
     }
     const options = CONFIG.translateOptions;
     const { translate: googleTranslate } = require('google-translate')(CONFIG.googleApiKey, options);
@@ -197,7 +229,7 @@ exports.flatten = flatten;
 /**
  * 百度翻译
  */
-function baiduTranslate(text, toLang = 'en_US') {
+function baiduTranslate(text, toLang = 'en_US', callback) {
     const lang = const_1.PROJECT_CONFIG.langMap[toLang];
     const CONFIG = getProjectConfig();
     const appid = CONFIG.baiduAppid;
@@ -221,16 +253,33 @@ function baiduTranslate(text, toLang = 'en_US') {
         body: form
     };
     const api = 'http://fanyi-api.baidu.com/api/trans/vip/translate';
-    return withTimeout(node_fetch_1.default(api, option)
+    return node_fetch_1.default(api, option)
         .then(data => data.json())
         .then(data => {
         const translateText = data.trans_result.shift().dst;
         console.warn(`\nzh-CN: ${text} -> ${toLang}: ${translateText}`);
-        return translateText;
-    })
-        .catch(err => {
-        console.error(`\nzh-CN: ${text} -> ${toLang}: 翻译出错 -> ${err}`);
-        return '';
-    }), 5000);
+        callback(translateText);
+    }).catch((error) => {
+        console.log(error);
+        callback(text, error);
+    });
+    // return withTimeout(
+    //   fetch(api, option)
+    //     .then(data => data.json())
+    //     .then(data => {
+    //       const translateText = data.trans_result.shift().dst;
+    //       console.warn(`\nzh-CN: ${text} -> ${toLang}: ${translateText}`);
+    //       callback(translateText)
+    //       return translateText;
+    //     })
+    //     .catch(err => {
+    //       console.log(err)
+    //       console.error(`\nzh-CN: ${text} -> ${toLang}: 翻译出错 -> ${err}`);
+    //       callback('')
+    //       return '';
+    //     }),
+    //   5000
+    // );
 }
+exports.baiduTranslate = baiduTranslate;
 //# sourceMappingURL=utils.js.map

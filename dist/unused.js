@@ -10,7 +10,7 @@ const path = require("path");
 const utils_1 = require("./utils");
 const lookingForString = '';
 function findUnUsed() {
-    const srcLangDir = path.resolve(utils_1.getKiwiDir(), 'zh-CN');
+    const srcLangDir = path.resolve(utils_1.getKiwiDir(), utils_1.getKiwiSrcLang());
     let files = fs.readdirSync(srcLangDir);
     files = files.filter(file => file.endsWith('.ts') && file !== 'index.ts');
     const unUnsedKeys = [];

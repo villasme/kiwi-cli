@@ -10,14 +10,14 @@ require('ts-node').register({
 import * as fs from 'fs';
 import * as path from 'path';
 import * as _ from 'lodash';
-import { tsvParseRows } from 'd3-dsv';
+import { tsvParseRows, csvParseRows } from 'd3-dsv';
 import { getAllMessages, getProjectConfig, traverse } from './utils';
 
 const CONFIG = getProjectConfig();
 
 function getMessagesToImport(file: string) {
   const content = fs.readFileSync(file).toString();
-  const messages = tsvParseRows(content, ([key, value]) => {
+  const messages = csvParseRows(content, ([key, value]) => {
     try {
       // value 的形式和 JSON 中的字符串值一致，其中的特殊字符是以转义形式存在的，
       // 如换行符 \n，在 value 中占两个字符，需要转成真正的换行符。

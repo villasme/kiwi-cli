@@ -30,7 +30,7 @@ function exportMessages(file, lang) {
             console.log('All the messages have been translated.');
             return;
         }
-        const content = d3_dsv_1.tsvFormatRows(messagesToTranslate);
+        const content = d3_dsv_1.csvFormatRows(messagesToTranslate);
         const sourceFile = file || `./export-${lang}`;
         fs.writeFileSync(sourceFile, content);
         console.log(`Exported ${messagesToTranslate.length} message(s).`);

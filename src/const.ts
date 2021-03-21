@@ -11,6 +11,7 @@ export const PROJECT_CONFIG = {
   defaultConfig: {
     kiwiDir: './.kiwi',
     configFile: `./.kiwi/${KIWI_CONFIG_FILE}`,
+    exemption: ".kiwi/exemption.js",
     srcLang: 'zh-CN',
     distLangs: ['en-US'],
     googleApiKey: '',

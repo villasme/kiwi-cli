@@ -4,12 +4,12 @@
  */
 import * as fs from 'fs';
 import * as path from 'path';
-import { getKiwiDir, getLangDir, traverse } from './utils';
+import { getKiwiDir, getLangDir, traverse, getKiwiSrcLang } from './utils';
 
 const lookingForString = '';
 
 function findUnUsed() {
-  const srcLangDir = path.resolve(getKiwiDir(), 'zh-CN');
+  const srcLangDir = path.resolve(getKiwiDir(), getKiwiSrcLang());
   let files = fs.readdirSync(srcLangDir);
   files = files.filter(file => file.endsWith('.ts') && file !== 'index.ts');
   const unUnsedKeys = [];

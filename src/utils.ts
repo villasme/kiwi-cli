@@ -9,6 +9,7 @@ import fetch from 'node-fetch';
 import { createHash } from 'crypto';
 import * as FormData from 'form-data';
 import * as deasync from 'deasync';
+import { translate as baiduTrans } from './baidu'
 import { PROJECT_CONFIG, KIWI_CONFIG_FILE } from './const';
 
 function lookForFiles(dir: string, fileName: string): string {
@@ -45,6 +46,18 @@ function getProjectConfig() {
   return obj;
 }
 
+
+/**
+ * 获得免翻文案
+ */
+export function getExemption() {
+  const CONFIG = getProjectConfig();
+  const srcFile = path.resolve(CONFIG.exemption);
+  const texts = require(srcFile);
+  return texts;
+}
+
+
 /**
  * 获取语言资源的根目录
  */
@@ -55,6 +68,19 @@ function getKiwiDir() {
     return config.kiwiDir;
   }
 }
+
+/**
+ * 获取语言资源 srcLang eg: zh_CN
+ */
+function getKiwiSrcLang() {
+  const config = getProjectConfig();
+
+  if (config) {
+    return config.srcLang;
+  }
+}
+
+
 
 /**
  * 获取对应语言的目录位置
@@ -144,10 +170,22 @@ function withTimeout(promise, ms) {
  */
 function translateText(text, toLang) {
   const CONFIG = getProjectConfig();
-  deasync.sleep(2000);
+
+  if (!text) {
+    return Promise.resolve('') 
+  }
 
   if (!CONFIG.googleApiKey) {
-    return baiduTranslate(text, toLang);
+    return new Promise((resolve, reject) => {
+      baiduTrans(text, toLang)(function (data, err) {
+        if (err) {
+          resolve('')
+          console.log('error:', err)
+        } else {
+          resolve(data)
+        }
+      });
+    })
   }
 
   const options = CONFIG.translateOptions;
@@ -205,7 +243,7 @@ function flatten(obj, prefix = '') {
 /**
  * 百度翻译
  */
-function baiduTranslate(text, toLang = 'en_US') {
+function baiduTranslate(text, toLang = 'en_US', callback) {
   const lang = PROJECT_CONFIG.langMap[toLang];
   const CONFIG = getProjectConfig();
   const appid = CONFIG.baiduAppid;
@@ -230,25 +268,41 @@ function baiduTranslate(text, toLang = 'en_US') {
     body: form
   };
   const api = 'http://fanyi-api.baidu.com/api/trans/vip/translate';
-  return withTimeout(
-    fetch(api, option)
-      .then(data => data.json())
-      .then(data => {
-        const translateText = data.trans_result.shift().dst;
-        console.warn(`\nzh-CN: ${text} -> ${toLang}: ${translateText}`);
-        return translateText;
-      })
-      .catch(err => {
-        console.error(`\nzh-CN: ${text} -> ${toLang}: 翻译出错 -> ${err}`);
-        return '';
-      }),
-    5000
-  );
+  return fetch(api, option)
+  .then(data => data.json())
+  .then(data => {
+    const translateText = data.trans_result.shift().dst;
+    console.warn(`\nzh-CN: ${text} -> ${toLang}: ${translateText}`);
+    callback(translateText)
+  }).catch((error) => {
+    console.log(error)
+    callback(text, error)
+  })
+  
+  // return withTimeout(
+  //   fetch(api, option)
+  //     .then(data => data.json())
+  //     .then(data => {
+  //       const translateText = data.trans_result.shift().dst;
+  //       console.warn(`\nzh-CN: ${text} -> ${toLang}: ${translateText}`);
+  //       callback(translateText)
+  //       return translateText;
+  //     })
+  //     .catch(err => {
+  //       console.log(err)
+  //       console.error(`\nzh-CN: ${text} -> ${toLang}: 翻译出错 -> ${err}`);
+  //       callback('')
+  //       return '';
+  //     }),
+  //   5000
+  // );
 }
 
 export {
   getKiwiDir,
   getLangDir,
+  baiduTranslate,
+  getKiwiSrcLang,
   traverse,
   retry,
   withTimeout,

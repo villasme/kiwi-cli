@@ -1,5 +1,5 @@
 /**
- * @author linhuiw
+ * @author villas
  * @desc 翻译文件
  */
 require('ts-node').register({
@@ -10,7 +10,8 @@ require('ts-node').register({
 import * as fs from 'fs';
 import * as path from 'path';
 import * as _ from 'lodash';
-import { traverse, getProjectConfig, getLangDir, translateText } from './utils';
+import { traverse, getProjectConfig, getLangDir, translateText, getExemption } from './utils';
+import { getDistText, getMockTexts } from './mock';
 const CONFIG = getProjectConfig();
 
 /** 是否自动机翻 */
@@ -24,6 +25,9 @@ async function getTranslations(file: string, toLang: any) {
   const fileNameWithoutExt = path.basename(file).split('.')[0];
   const srcLangDir = getLangDir(CONFIG.srcLang);
   const distLangDir = getLangDir(toLang);
+  const mocks = getMockTexts(toLang)
+  const exemption = getExemption()
+  const distTextsAll = getDistText(toLang);
   const srcFile = path.resolve(srcLangDir, file);
   const distFile = path.resolve(distLangDir, file);
   const { default: texts } = require(srcFile);
@@ -35,14 +39,34 @@ async function getTranslations(file: string, toLang: any) {
   traverse(texts, async (text: any, path: string) => {
     const key = fileNameWithoutExt + '.' + path;
     const distText = _.get(distTexts, path);
+    const distTextsValue =  _.get(distTextsAll, key)
+    if (distTextsValue) {
+      translations[key] = Promise.resolve([key, distTextsValue, text]); 
+      console.info(`\n\t <${toLang}-${key}> key(${key}) zh-CN: ${text} -> ${toLang}: ${distTextsValue}`);
+      return 
+    }
+
+    if (toLang === 'en_US' && exemption[key]) {
+      translations[key] = Promise.resolve([key, exemption[key], text]); 
+      console.info(`\n\t <exemption> key(${key}) zh-CN: ${text} -> ${toLang}: ${exemption[key]}`);
+      return 
+    }
+    if (mocks[key]) {
+      translations[key] = Promise.resolve([key, mocks[key], text]); 
+      console.info(`\n\t <mock> key(${key}) zh-CN: ${text} -> ${toLang}: ${mocks[key]}`);
+      return
+    }
     if (isAuto) {
       const autoText = distText
         ? [key, distText, text]
-        : translateText(text, toLang).then(translatedText => [key, translatedText, text]);
+        : translateText(text, toLang).then(translatedText =>{
+          return [key, translatedText, text]
+        });
       translations[key] = Promise.resolve(autoText);
     } else {
       translations[key] = Promise.resolve([key, distText || text, text]);
     }
+
   });
 
   return translations;
@@ -72,7 +96,7 @@ function writeTranslations(file: string, toLang: any, translations: { [x: string
       if (err) {
         reject(err);
       } else {
-        resolve();
+        resolve(true);
       }
     });
   });

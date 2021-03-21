@@ -8,7 +8,7 @@ require('ts-node').register({
   }
 });
 import * as fs from 'fs';
-import { tsvFormatRows } from 'd3-dsv';
+import { csvFormatRows } from 'd3-dsv';
 import { getAllMessages, getProjectConfig } from './utils';
 import * as _ from 'lodash';
 
@@ -35,7 +35,7 @@ function exportMessages(file?: string, lang?: string) {
       return;
     }
 
-    const content = tsvFormatRows(messagesToTranslate);
+    const content = csvFormatRows(messagesToTranslate);
     const sourceFile = file || `./export-${lang}`;
     fs.writeFileSync(sourceFile, content);
     console.log(`Exported ${messagesToTranslate.length} message(s).`);
