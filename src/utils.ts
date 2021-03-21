@@ -8,7 +8,6 @@ import * as fs from 'fs';
 import fetch from 'node-fetch';
 import { createHash } from 'crypto';
 import * as FormData from 'form-data';
-import * as deasync from 'deasync';
 import { translate as baiduTrans } from './baidu'
 import { PROJECT_CONFIG, KIWI_CONFIG_FILE } from './const';
 
