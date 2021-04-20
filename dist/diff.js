@@ -6,7 +6,6 @@ exports.diff = void 0;
  * @author villas
  * @description 文案比较
  * 比较两个文案差异， 判断 file1 中的文案在 file2 中是否存在，将差异保存到 exportDiff.csv 中
- * node-ts diff.ts ~/Desktop/file1.csv ~/Desktop/file2.csv ~/Desktop/exportDiff.csv
  */
 require('ts-node').register({
     compilerOptions: {
@@ -72,15 +71,6 @@ function getFileContent(src) {
         console.error(errorMessage);
         process.exit(1);
     }
-    return rst;
-}
-function sortObject(obj) {
-    const rst = {};
-    Object.keys(obj)
-        .sort()
-        .forEach(key => {
-        rst[key] = obj[key];
-    });
     return rst;
 }
 function diff(morePath, lessPath, outputPath) {
