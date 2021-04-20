@@ -1,6 +1,6 @@
 {
   "name": "@villas/kiwi-clis",
-  "version": "1.0.10",
+  "version": "1.1.0",
   "description": "a cli for kiwi",
   "main": "dist/index.js",
   "scripts": {
@@ -31,7 +31,7 @@
     "@babel/core": "^7.5.5",
     "@types/commander": "^2.12.2",
     "@types/lodash": "^4.14.119",
-    "@types/node": "^10.17.35",
+    "@types/node": "^14.14.41",
     "commander": "^2.19.0",
     "d3-dsv": "^1.0.10",
     "fs-extra": "^7.0.1",

@@ -11,6 +11,7 @@ import { mockLangs } from './mock';
 import { extractAll } from './extract/extract';
 import * as ora from 'ora';
 import { exportAllMessages } from './exportAll';
+import { diff } from './diff'
 
 /**
  * 进度条加载
@@ -31,6 +32,7 @@ commander
   .option('--import [file] [lang]', '导入翻译文案')
   .option('--export [file] [lang]', '导出未翻译的文案')
   .option('--exportAll [file] [lang]', '导出所有文案')
+  .option('--diff [firstFilePath] [secondFilePath] [outputpath]', '对比一个表格和第二个表格的不同, 文件格式csv')
   .option('--sync', '同步各种语言的文案(isAutoTranslate=ture 自动翻译)')
   .option('--mock', '使用 百度/Google 翻译')
   .option('--unused', '导出未使用的文案')
@@ -92,6 +94,16 @@ if (commander.exportAll) {
       exportAllMessages();
     } else if (commander.args) {
       exportAllMessages(commander.exportAll, commander.args[0]);
+    }
+  });
+}
+
+if (commander.diff) {
+  spining('导出不同文案', async () => {
+    if (commander.diff && commander.args.length === 0) {
+      console.log('\n请传入参数 --diff [firstFilePath] [secondFilePath] [outputpath]')
+    } else if (commander.args) {
+      diff(commander.diff, commander.args[0], commander.args[1]);
     }
   });
 }
